@@ -1,0 +1,82 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+h1, h2, h3 {
+  color: #2c3e50;
+}
+
+#login, #dashboard {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.notification, .class-card, .search-result {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification button, .class-card button, .search-result button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.notification button:hover, .class-card button:hover, .search-result button:hover {
+  background-color: #2980b9;
+}
+
+#classSearch {
+  padding: 8px;
+  margin-right: 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  width: 200px;
+}
+
+button {
+  padding: 8px 12px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #c0392b;
+}
+
+#notifications, #classes, #searchResults {
+  margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+  .notification, .class-card, .search-result {
+    flex-direction: column;
+    text-align: center;
+  }
+  .notification button, .class-card button, .search-result button {
+    margin-top: 10px;
+    width: 100%;
+  }
+  #classSearch {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}

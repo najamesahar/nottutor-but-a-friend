@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mentora Dashboard</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <h1>Mentora Dashboard</h1>
+  <div id="login">
+    <a href="/auth/google">Login with Google</a>
+    <div id="authStatus"></div>
+  </div>
+  <div id="dashboard" style="display: none;">
+    <h2>Notifications</h2>
+    <div id="notifications"></div>
+    <h2>Classes</h2>
+    <div style="margin-bottom: 10px;">
+      <input type="text" id="classSearch" placeholder="Search by name or title...">
+      <button onclick="searchClasses()">Search</button>
+    </div>
+    <div id="classes"></div>
+    <h3>Search Results</h3>
+    <div id="searchResults"></div>
+    <button onclick="logout()">Logout</button>
+  </div>
+  <div id="debug"></div>
+
+  <script src="/js/scripts.js"></script>
+</body>
+</html>
