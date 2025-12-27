@@ -1,0 +1,69 @@
+[{
+  "_id": {
+    "$oid": "68e69a589b2ae8d2dd7ea689"
+  },
+  "recipient": {
+    "$oid": "689764b4055105810e0ae409"
+  },
+  "message": "New student enrolled in Calculus 101",
+  "isRead": false,
+  "createdAt": {
+    "$date": "2025-10-08T09:00:00.000Z"
+  },
+  "expiryDate": {
+    "$date": "2025-10-15T09:00:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68e69a589b2ae8d2dd7ea68a"
+  },
+  "recipient": {
+    "$oid": "689764b4055105810e0ae409"
+  },
+  "message": "Class Python Basics updated",
+  "isRead": true,
+  "createdAt": {
+    "$date": "2025-10-06T09:00:00.000Z"
+  },
+  "expiryDate": null
+},
+{
+  "_id": {
+    "$oid": "68e6a49974fc0bb4d4384f6c"
+  },
+  "recipient": {
+    "$oid": "689764b4055105810e0ae409"
+  },
+  "message": "Student 689764b4055105810e0ae409 booked Calculus 101",
+  "isRead": false,
+  "createdAt": {
+    "$date": "2025-10-08T17:51:21.398Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68e6a4a974fc0bb4d4384f7e"
+  },
+  "recipient": {
+    "$oid": "689764b4055105810e0ae409"
+  },
+  "message": "Student 689764b4055105810e0ae409 booked Python Basics",
+  "isRead": false,
+  "createdAt": {
+    "$date": "2025-10-08T17:51:37.534Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68e6b4919b2ae8d2dd7ea69a"
+  },
+  "recipient": "689764b4055105810e0ae411",
+  "message": "Zainab Ali booked Chemistry 101",
+  "isRead": false,
+  "createdAt": {
+    "$date": "2025-10-08T23:56:00.000Z"
+  }
+}]

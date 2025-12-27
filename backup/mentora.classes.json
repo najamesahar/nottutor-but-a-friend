@@ -1,0 +1,90 @@
+[{
+  "_id": {
+    "$oid": "68e69a2d9b2ae8d2dd7ea682"
+  },
+  "title": "Calculus 101",
+  "tutor": {
+    "$oid": "689764b4055105810e0ae409"
+  },
+  "createdAt": {
+    "$date": "2025-10-08T09:00:00.000Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-08T09:00:00.000Z"
+  },
+  "__v": 1,
+  "bookedBy": [
+    {
+      "$oid": "689764b4055105810e0ae409"
+    }
+  ],
+  "maxStudents": 10
+},
+{
+  "_id": {
+    "$oid": "68e69a2d9b2ae8d2dd7ea683"
+  },
+  "title": "Python Basics",
+  "tutor": {
+    "$oid": "689764b4055105810e0ae409"
+  },
+  "createdAt": {
+    "$date": "2025-10-08T09:00:00.000Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-08T09:00:00.000Z"
+  },
+  "__v": 1,
+  "bookedBy": [
+    {
+      "$oid": "689764b4055105810e0ae409"
+    }
+  ],
+  "maxStudents": 10
+},
+{
+  "_id": {
+    "$oid": "68e6add89b2ae8d2dd7ea68e"
+  },
+  "title": "Physics 101",
+  "tutor": "689764b4055105810e0ae410",
+  "bookedBy": [],
+  "maxStudents": 15,
+  "schedule": {
+    "startTime": {
+      "$date": "2025-10-09T10:30:00.000Z"
+    },
+    "endTime": {
+      "$date": "2025-10-09T12:00:00.000Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-10-08T23:30:00.000Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-08T23:30:00.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68e6b45c9b2ae8d2dd7ea695"
+  },
+  "title": "Biology 101",
+  "tutor": "689764b4055105810e0ae411",
+  "bookedBy": [],
+  "maxStudents": 12,
+  "schedule": {
+    "startTime": {
+      "$date": "2025-10-09T14:00:00.000Z"
+    },
+    "endTime": {
+      "$date": "2025-10-09T15:30:00.000Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-10-08T23:56:00.000Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-08T23:56:00.000Z"
+  }
+}]

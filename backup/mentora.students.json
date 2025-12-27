@@ -1,0 +1,25 @@
+[{
+  "_id": {
+    "$oid": "68e69a449b2ae8d2dd7ea686"
+  },
+  "googleId": "test_student_123",
+  "email": "test@student.mentora.app",
+  "name": "Test Student",
+  "role": "student",
+  "enrolledSubjects": [
+    "Calculus"
+  ],
+  "createdAt": {
+    "$date": "2025-10-08T09:00:00.000Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-08T09:00:00.000Z"
+  }
+},
+{
+  "_id": "689764b4055105810e0ae412",
+  "googleId": "google412",
+  "email": "student3@mentora.app",
+  "name": "Zainab Ali",
+  "role": "student"
+}]

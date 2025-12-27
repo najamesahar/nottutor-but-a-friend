@@ -1,0 +1,43 @@
+[{
+  "_id": {
+    "$oid": "689764b4055105810e0ae409"
+  },
+  "googleId": "112705728701334746454",
+  "email": "najamesahar@gmail.com",
+  "name": "Najam Sahar",
+  "role": "tutor",
+  "bio": "Experienced math tutor",
+  "expertise": [
+    "Mathematics",
+    "Programming"
+  ],
+  "subjects": [
+    "Calculus",
+    "Python"
+  ],
+  "hourlyRate": 25,
+  "rating": 4.8,
+  "verified": true,
+  "bookings": [],
+  "availability": [
+    {
+      "date": {
+        "$date": "2025-10-10T00:00:00.000Z"
+      },
+      "time": "10:00-12:00"
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-10-08T09:00:00.000Z"
+  },
+  "updatedAt": {
+    "$date": "2025-10-08T09:00:00.000Z"
+  }
+},
+{
+  "_id": "689764b4055105810e0ae411",
+  "googleId": "google411",
+  "email": "ahmadkhan@gmail.com",
+  "name": "Ahmad Khan",
+  "role": "tutor"
+}]

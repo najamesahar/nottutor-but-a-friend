@@ -1,0 +1,54 @@
+[{
+  "_id": {
+    "$oid": "688854608988d322258e52d1"
+  },
+  "student": {
+    "$oid": "6884aec4524ba9b2fc7de23e"
+  },
+  "classId": {
+    "$oid": "68867ac5e8c73a806979bb34"
+  },
+  "status": "booked",
+  "bookedAt": {
+    "$date": "2025-07-29T04:56:00.147Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68887af92450551f8758e8e4"
+  },
+  "class": {
+    "$oid": "68885e1b5abfed510a8ff99f"
+  },
+  "student": {
+    "$oid": "6884aec4524ba9b2fc7de23e"
+  },
+  "tutor": {
+    "$oid": "68853365b1c9876a166acc68"
+  },
+  "status": "cancelled",
+  "bookedAt": {
+    "$date": "2025-07-29T07:40:41.702Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688af52de24250cb858e23f2"
+  },
+  "class": {
+    "$oid": "68867ac5e8c73a806979bb34"
+  },
+  "student": {
+    "$oid": "6884aec4524ba9b2fc7de23e"
+  },
+  "tutor": {
+    "$oid": "68853365b1c9876a166acc68"
+  },
+  "status": "booked",
+  "bookedAt": {
+    "$date": "2025-07-31T04:46:37.217Z"
+  },
+  "__v": 0
+}]

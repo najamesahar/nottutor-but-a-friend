@@ -1,0 +1,16 @@
+[{
+  "_id": {
+    "$oid": "6886ffbb868181271351f96f"
+  },
+  "studentId": {
+    "$oid": "6884aec4524ba9b2fc7de23e"
+  },
+  "classId": {
+    "$oid": "68854407ab74cccd6d29455c"
+  },
+  "status": "rescheduled",
+  "bookingDate": {
+    "$date": "2025-07-28T04:42:35.644Z"
+  },
+  "__v": 0
+}]
