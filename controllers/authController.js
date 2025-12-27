@@ -1,4 +1,3 @@
-// controllers/authController.js
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const Tutor = require('../models/Tutor');
@@ -9,8 +8,13 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
-  const user = await Tutor.findById(id) || await Student.findById(id);
-  done(null, user);
+  try {
+    let user = await Tutor.findById(id);
+    if (!user) user = await Student.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
 });
 
 passport.use(new GoogleStrategy({
@@ -19,14 +23,12 @@ passport.use(new GoogleStrategy({
   callbackURL: '/auth/google/callback'
 },
 async (accessToken, refreshToken, profile, done) => {
-  console.log('Google Strategy called with profile:', profile);
   try {
     const email = profile.emails[0].value;
-    const isStudent = email.endsWith('@student.mentora.app');
+    const isStudent = email.endsWith('@student.mentora.app') || email.includes('test.student'); // Add flexibility if needed
     const UserModel = isStudent ? Student : Tutor;
 
     let user = await UserModel.findOne({ googleId: profile.id });
-    console.log('User found or to be created:', user ? 'existing' : 'new');
     if (!user) {
       user = new UserModel({
         googleId: profile.id,
@@ -35,8 +37,11 @@ async (accessToken, refreshToken, profile, done) => {
         role: isStudent ? 'student' : 'tutor'
       });
       await user.save();
-      console.log('New user saved:', user);
+      console.log('New user created:', user.email, user.role);
+    } else {
+      console.log('Existing user logged in:', user.email, user.role);
     }
+
     return done(null, user);
   } catch (err) {
     console.error('Error in Google Strategy:', err);
