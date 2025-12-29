@@ -75,27 +75,33 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Unhandled promise rejections
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
+// Export app for testing and separate startup
+module.exports = app;
 
-// Uncaught exceptions
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err.stack);
-  process.exit(1); // Exit on uncaught exception
-});
+async function start() {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('Connected to MongoDB');
 
-// Database connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
     console.error('MongoDB connection error:', err);
+    process.exit(1);
+  }
+}
+
+if (require.main === module) {
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  });
+
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err.stack);
     process.exit(1);
   });
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  start();
+}
