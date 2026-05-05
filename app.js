@@ -1,4 +1,36 @@
 require('dotenv').config();
+const express = require('express');
+const session = require('express-session');
+const passport = require('passport');
+const mongoose = require('mongoose');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
+const app = express();
+
+// 1. THIS MUST BE FIRST - Before any app.use()
+app.set('trust proxy', 1); 
+
+// 2. Body parsing
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// 3. Session Setup
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'fallback-secret',
+  resave: false,
+  saveUninitialized: false,
+  proxy: true, // Add this line to explicitly tell the session to trust the proxy
+  cookie: { 
+    secure: true, // Now that proxy is trusted, we can keep this true
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// 4. Passport & Routes (Continue with the rest of your code...)
+app.use(passport.initialize());
+app.use(passport.session());require('dotenv').config();
 const express = require('express'); // 1. Define express first
 const session = require('express-session');
 const passport = require('passport');
