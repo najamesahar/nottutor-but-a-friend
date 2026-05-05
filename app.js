@@ -1,5 +1,5 @@
 require('dotenv').config();
-const express = require('express');
+const express = require('express'); // 1. Define express first
 const session = require('express-session');
 const passport = require('passport');
 const mongoose = require('mongoose');
@@ -8,19 +8,22 @@ const rateLimit = require('express-rate-limit');
 
 const authRoutes = require('./routes/auth');
 const apiRoutes = require('./routes/api');
-const passportConfig = require('./controllers/authController'); // Loads Google Strategy
+const passportConfig = require('./controllers/authController');
 
-const app = express();
+const app = express(); // 2. Then initialize app
+
+// Render/Proxy Settings
+app.set('trust proxy', 1); // 3. Now this line will work correctly
 
 // Initialize Passport strategy
-passportConfig; // This triggers setup (serialize/deserialize + GoogleStrategy)
+passportConfig; 
 
 // Security Middleware
-app.use(helmet()); // Secure HTTP headers
+app.use(helmet()); 
 
-// Rate Limiting (100 requests per 15 minutes per IP)
+// Rate Limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000, 
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
@@ -34,7 +37,10 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'fallback-secret-please-change',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' } // secure in production
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax' // 4. Add this to help with the login redirect loop
+  }
 }));
 
 // Passport middleware
@@ -48,7 +54,7 @@ app.use(express.static('public'));
 app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
 
-// Root route - serve dashboard
+// Root route
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
@@ -66,24 +72,13 @@ app.get('/auth/status', (req, res) => {
   }
 });
 
-// Global error handler (must be after routes)
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err.stack);
   res.status(err.status || 500).json({
     error: 'Something went wrong!',
     message: err.message || 'Internal server error'
   });
-});
-
-// Unhandled promise rejections
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
-
-// Uncaught exceptions
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err.stack);
-  process.exit(1); // Exit on uncaught exception
 });
 
 // Database connection
