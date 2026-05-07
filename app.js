@@ -13,55 +13,57 @@ const passportConfig = require('./controllers/authController');
 
 const app = express();
 
-// 1. PROXY SETTINGS (Crucial for Render/Google Login)
+// 1. PROXY SETTINGS (Crucial for Render & Google OAuth)
+// This must be set before any middleware that uses the connection
 app.set('trust proxy', 1); 
 
-// 2. MIDDLEWARE
+// 2. SECURITY MIDDLEWARE
 app.use(helmet()); 
 
-// Rate Limiting
+// Rate Limiting (configured to trust Render's X-Forwarded-For header)
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
+  windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false }, // Prevents the ERL_UNEXPECTED error in Render logs
   message: { error: 'Too many requests from this IP, please try again later.' }
 });
 app.use(limiter);
 
-// Body parsing
+// 3. BODY PARSING
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 3. SESSION SETUP
+// 4. SESSION SETUP
 app.use(session({
   secret: process.env.SESSION_SECRET || 'nottutor-fallback-secret',
-  resave: true, // Force save for login persistence
+  resave: true, // Forces session to be saved back to the store for persistence
   saveUninitialized: false,
-  proxy: true, 
+  proxy: true, // Explicitly tell express-session to trust the proxy
   cookie: { 
-    secure: true, // Required for Render HTTPS
+    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (Render)
     sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
 
-// 4. PASSPORT & STATIC FILES
-passportConfig; // Initialize Google Strategy
+// 5. PASSPORT & STATIC FILES
+passportConfig; // Initialize Google Strategy and serialization
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static('public'));
 
-// 5. ROUTES
+// 6. ROUTES
 app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
 
-// Main entry point
+// Root route - serves your dashboard/landing page
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
-// Auth check for debugging
+// Auth status endpoint for debugging login loops
 app.get('/auth/status', (req, res) => {
   if (req.isAuthenticated()) {
     res.json({
@@ -73,7 +75,7 @@ app.get('/auth/status', (req, res) => {
   }
 });
 
-// 6. ERROR HANDLING
+// 7. GLOBAL ERROR HANDLING
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err.stack);
   res.status(err.status || 500).json({
@@ -82,32 +84,42 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 7. DATABASE & SERVER START
+// 8. DATABASE CONNECTION & SERVER START
 async function startServer() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('Connected to MongoDB Cloud');
+    // We only connect to the database and start the listener if we ARE NOT in a test environment
+    if (process.env.NODE_ENV !== 'test') {
+      await mongoose.connect(process.env.MONGODB_URI);
+      console.log('Connected to MongoDB Cloud');
 
-    const PORT = process.env.PORT || 10000;
-    app.listen(PORT, () => {
-      console.log(`NotTutor is live on port ${PORT}`);
-    });
+      const PORT = process.env.PORT || 10000;
+      app.listen(PORT, () => {
+        console.log(`NotTutor is live on port ${PORT}`);
+      });
+    }
   } catch (err) {
     console.error('Database connection error:', err);
-    process.exit(1);
+    // Only exit the process if we aren't testing
+    if (process.env.NODE_ENV !== 'test') {
+      process.exit(1);
+    }
   }
 }
 
-// Process handling
+// Process-level error handling
 process.on('unhandledRejection', (reason) => {
   console.error('Unhandled Rejection:', reason);
 });
 
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err.stack);
-  process.exit(1);
+  if (process.env.NODE_ENV !== 'test') {
+    process.exit(1);
+  }
 });
 
+// Execute the startup
 startServer();
 
+// Export for Jest testing
 module.exports = app;
