@@ -6,94 +6,65 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
+// Route & Config Imports
+const authRoutes = require('./routes/auth');
+const apiRoutes = require('./routes/api');
+const passportConfig = require('./controllers/authController');
+
 const app = express();
 
-// 1. THIS MUST BE FIRST - Before any app.use()
+// 1. PROXY SETTINGS (Crucial for Render & Google OAuth)
+// This must be set before any middleware that uses the connection (like rate limiter or session)
 app.set('trust proxy', 1); 
 
-// 2. Body parsing
+// 2. SECURITY MIDDLEWARE
+app.use(helmet()); 
+
+// Rate Limiting (configured to trust Render's X-Forwarded-For header)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: { xForwardedForHeader: false }, // Prevents the ERL_UNEXPECTED error in Render logs
+  message: { error: 'Too many requests from this IP, please try again later.' }
+});
+app.use(limiter);
+
+// 3. BODY PARSING
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 3. Session Setup
+// 4. SESSION SETUP
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'fallback-secret',
-  resave: false,
+  secret: process.env.SESSION_SECRET || 'nottutor-fallback-secret',
+  resave: true, // Forces session to be saved back to the store
   saveUninitialized: false,
-  proxy: true, // Add this line to explicitly tell the session to trust the proxy
+  proxy: true, // Explicitly tell express-session to trust the proxy
   cookie: { 
-    secure: true, // Now that proxy is trusted, we can keep this true
+    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (Render)
     sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
 
-// 4. Passport & Routes (Continue with the rest of your code...)
-app.use(passport.initialize());
-app.use(passport.session());require('dotenv').config();
-const express = require('express'); // 1. Define express first
-const session = require('express-session');
-const passport = require('passport');
-const mongoose = require('mongoose');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-
-const authRoutes = require('./routes/auth');
-const apiRoutes = require('./routes/api');
-const passportConfig = require('./controllers/authController');
-
-const app = express(); // 2. Then initialize app
-
-// Render/Proxy Settings
-app.set('trust proxy', 1); // 3. Now this line will work correctly
-
-// Initialize Passport strategy
-passportConfig; 
-
-// Security Middleware
-app.use(helmet()); 
-
-// Rate Limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Too many requests from this IP, please try again later.' }
-});
-app.use(limiter);
-
-// Body parsing & session
-app.use(express.json());
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'fallback-secret-please-change',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { 
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax' // 4. Add this to help with the login redirect loop
-  }
-}));
-
-// Passport middleware
+// 5. PASSPORT & STATIC FILES
+passportConfig; // Initialize Google Strategy and serialization
 app.use(passport.initialize());
 app.use(passport.session());
-
-// Serve static files
 app.use(express.static('public'));
 
-// Routes
+// 6. ROUTES
 app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
 
-// Root route
+// Root route - serves your dashboard/landing page
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
-// Auth status endpoint
+// Auth status endpoint for debugging login loops
 app.get('/auth/status', (req, res) => {
-  console.log('Auth status check:', req.isAuthenticated() ? req.user._id : 'not authenticated');
   if (req.isAuthenticated()) {
     res.json({
       authenticated: true,
@@ -104,7 +75,7 @@ app.get('/auth/status', (req, res) => {
   }
 });
 
-// Global error handler
+// 7. GLOBAL ERROR HANDLING
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err.stack);
   res.status(err.status || 500).json({
@@ -113,16 +84,42 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Database connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
-  });
+// 8. DATABASE CONNECTION & SERVER START
+async function startServer() {
+  try {
+    // We only connect to the database and start the listener if we ARE NOT in a test environment
+    if (process.env.NODE_ENV !== 'test') {
+      await mongoose.connect(process.env.MONGODB_URI);
+      console.log('Connected to MongoDB Cloud');
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+      const PORT = process.env.PORT || 10000;
+      app.listen(PORT, () => {
+        console.log(`NotTutor is live on port ${PORT}`);
+      });
+    }
+  } catch (err) {
+    console.error('Database connection error:', err);
+    // Only exit the process if we aren't testing
+    if (process.env.NODE_ENV !== 'test') {
+      process.exit(1);
+    }
+  }
+}
+
+// Process-level error handling
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled Rejection:', reason);
 });
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err.stack);
+  if (process.env.NODE_ENV !== 'test') {
+    process.exit(1);
+  }
+});
+
+// Execute the startup
+startServer();
+
+// Export for Jest testing
+module.exports = app;
