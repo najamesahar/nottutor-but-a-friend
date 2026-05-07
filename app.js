@@ -3,6 +3,7 @@ const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
 const mongoose = require('mongoose');
+const MongoStore = require('connect-mongo');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
@@ -35,14 +36,19 @@ app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 4. SESSION SETUP
+// 4. SESSION SETUP with MongoDB persistence
 app.use(session({
   secret: process.env.SESSION_SECRET || 'nottutor-fallback-secret',
-  resave: true, // Forces session to be saved back to the store for persistence
-  saveUninitialized: false,
+  resave: false, // Don't save session if unmodified
+  saveUninitialized: false, // Don't save empty sessions
   proxy: true, // Explicitly tell express-session to trust the proxy
+  store: new MongoStore({
+    mongoUrl: process.env.MONGODB_URI,
+    touchAfter: 24 * 3600 // Lazy session update (in seconds)
+  }),
   cookie: { 
     secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (Render)
+    httpOnly: true, // Prevent client-side JS from accessing the cookie
     sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
