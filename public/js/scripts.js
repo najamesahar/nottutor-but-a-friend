@@ -210,89 +210,6 @@ eventSource.onmessage = (event) => {
   addNotification(notification);
 };
 
-function loadClasses() {
-  fetch('/api/classes/available')
-    .then(res => res.json())
-    .then(data => {
-      console.log('Classes data received:', data);
-      if (data.error) {
-        console.error('Error loading classes:', data.error);
-        return;
-      }
-      const container = document.getElementById('classes');
-      container.innerHTML = '';
-      if (Array.isArray(data)) {
-        data.forEach(c => {
-          const div = document.createElement('div');
-          div.className = 'class-card';
-          const info = document.createElement('span');
-          info.textContent = `${c.title} by ${c.tutor?.name || 'No tutor'} (Booked: ${c.bookedBy}/${c.maxStudents}) - ${new Date(c.schedule.startTime).toLocaleString()} to ${new Date(c.schedule.endTime).toLocaleString()}`;
-          info.onclick = () => showClassDetails(c._id); // Click to show details
-          info.style.cursor = 'pointer';
-          div.appendChild(info);
-          const studentId = localStorage.getItem('userId');
-          if (c.bookedBy.includes(studentId)) {
-            const cancelButton = document.createElement('button');
-            cancelButton.textContent = 'Cancel Booking';
-            cancelButton.onclick = () => cancelClass(c._id);
-            div.appendChild(cancelButton);
-          } else {
-            const bookButton = document.createElement('button');
-            bookButton.textContent = 'Book Class';
-            bookButton.onclick = () => bookClass(c._id);
-            div.appendChild(bookButton);
-          }
-          container.appendChild(div);
-        });
-      } else {
-        console.error('Unexpected data format:', data);
-      }
-    })
-    .catch(err => console.error('Classes fetch error:', err));
-}
-
-function searchClasses() {
-  const query = document.getElementById('classSearch').value;
-  fetch(`/api/classes/search?q=${query}`)
-    .then(res => res.json())
-    .then(data => {
-      console.log('Search data received:', data);
-      if (data.error) {
-        console.error('Error searching classes:', data.error);
-        return;
-      }
-      const container = document.getElementById('searchResults');
-      container.innerHTML = '';
-      if (Array.isArray(data)) {
-        data.forEach(c => {
-          const div = document.createElement('div');
-          div.className = 'search-result';
-          const info = document.createElement('span');
-          info.textContent = `${c.title} by ${c.tutor?.name || 'No tutor'} (Booked: ${c.bookedBy}/${c.maxStudents}) - ${new Date(c.schedule.startTime).toLocaleString()} to ${new Date(c.schedule.endTime).toLocaleString()}`;
-          info.onclick = () => showClassDetails(c._id); // Click to show details
-          info.style.cursor = 'pointer';
-          div.appendChild(info);
-          const studentId = localStorage.getItem('userId');
-          if (c.bookedBy.includes(studentId)) {
-            const cancelButton = document.createElement('button');
-            cancelButton.textContent = 'Cancel Booking';
-            cancelButton.onclick = () => cancelClass(c._id);
-            div.appendChild(cancelButton);
-          } else {
-            const bookButton = document.createElement('button');
-            bookButton.textContent = 'Book Class';
-            bookButton.onclick = () => bookClass(c._id);
-            div.appendChild(bookButton);
-          }
-          container.appendChild(div);
-        });
-      } else {
-        console.error('Unexpected search data format:', data);
-      }
-    })
-    .catch(err => console.error('Search fetch error:', err));
-}
-
 function showClassDetails(classId) {
   fetch(`/api/classes/${classId}`)
     .then(res => res.json())
@@ -301,11 +218,10 @@ function showClassDetails(classId) {
         alert(data.error);
         return;
       }
-      alert(`Class: ${data.title}\nTutor: ${data.tutor.name} (${data.tutor.email})\nBooked: ${data.bookedBy}/${data.maxStudents}\nTime: ${new Date(data.schedule.startTime).toLocaleString()} to ${new Date(data.schedule.endTime).toLocaleString()}\nDescription: ${data.description}`);
+      alert(`Class: ${data.title}\nTutor: ${data.tutor.name} (${data.tutor.email})\nBooked: ${data.bookedBy}/${data.maxStudents}\nTime: ${new Date(data.schedule.startTime).toLocaleString()} to ${new Date(data.schedule.endTime).toLocaleString()}`);
     })
     .catch(err => console.error('Class details fetch error:', err));
 }
 
-
-// Initialize
-checkAuth();
+// Initialize with a small delay to ensure session is loaded after Google OAuth redirect
+setTimeout(checkAuth, 100);
