@@ -12,11 +12,7 @@ router.get('/google/callback',
   passport.authenticate('google', {
     failureRedirect: '/',
     successRedirect: '/'
-  }),
-  (req, res) => {
-    console.log('Google OAuth successful for user:', req.user.email);
-    res.redirect('/');
-  }
+  })
 );
 
 // Logout route
