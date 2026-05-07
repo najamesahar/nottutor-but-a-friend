@@ -14,7 +14,7 @@ const passportConfig = require('./controllers/authController');
 const app = express();
 
 // 1. PROXY SETTINGS (Crucial for Render & Google OAuth)
-// This must be set before any middleware that uses the connection (like rate limiter or session)
+// This must be set before any middleware that uses the connection
 app.set('trust proxy', 1); 
 
 // 2. SECURITY MIDDLEWARE
@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 // 4. SESSION SETUP
 app.use(session({
   secret: process.env.SESSION_SECRET || 'nottutor-fallback-secret',
-  resave: true, // Forces session to be saved back to the store
+  resave: true, // Forces session to be saved back to the store for persistence
   saveUninitialized: false,
   proxy: true, // Explicitly tell express-session to trust the proxy
   cookie: { 
