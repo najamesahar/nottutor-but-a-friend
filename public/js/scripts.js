@@ -21,16 +21,22 @@ function checkAuth() {
     .then(res => res.json())
     .then(data => {
       console.log('Auth status:', data);
-      document.getElementById('authStatus').textContent = data.authenticated ? 'Logged in' : 'Not logged in';
       if (data.authenticated) {
         localStorage.setItem('userId', data.user._id);
         document.getElementById('login').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
         loadNotifications();
         loadClasses();
+      } else {
+        document.getElementById('login').style.display = 'block';
+        document.getElementById('dashboard').style.display = 'none';
       }
     })
-    .catch(err => console.error('Auth check error:', err));
+    .catch(err => {
+      console.error('Auth check error:', err);
+      document.getElementById('login').style.display = 'block';
+      document.getElementById('dashboard').style.display = 'none';
+    });
 }
 
 function loadNotifications() {
